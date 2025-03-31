@@ -1,0 +1,68 @@
+import tkinter as tk
+from tkinter import messagebox
+
+def add_task(event=None):
+    task = task_entry.get().strip()
+    if task:
+        task_list.insert(tk.END, task)
+        task_entry.delete(0, tk.END)
+    else:
+        messagebox.showwarning("Advertencia", "No puedes añadir una tarea vacía.")
+
+def mark_completed():
+    try:
+        selected_task_index = task_list.curselection()[0]
+        task_text = task_list.get(selected_task_index)
+        if not task_text.startswith("[✔]"):
+            task_list.delete(selected_task_index)
+            task_list.insert(selected_task_index, f"[✔] {task_text}")
+    except IndexError:
+        messagebox.showwarning("Advertencia", "Selecciona una tarea para marcar como completada.")
+
+def delete_task():
+    try:
+        selected_task_index = task_list.curselection()[0]
+        task_list.delete(selected_task_index)
+    except IndexError:
+        messagebox.showwarning("Advertencia", "Selecciona una tarea para eliminar.")
+
+def clear_tasks():
+    if messagebox.askyesno("Confirmación", "¿Estás seguro de que deseas eliminar todas las tareas?"):
+        task_list.delete(0, tk.END)
+
+def mark_completed_double_click(event):
+    mark_completed()
+
+# Configuración de la ventana principal
+root = tk.Tk()
+root.title("Lista de Tareas")
+root.geometry("400x450")
+root.configure(bg="#f0f0f0")
+
+# Campo de entrada y botones
+task_entry = tk.Entry(root, width=40)
+task_entry.pack(pady=10)
+task_entry.bind("<Return>", add_task)
+
+button_frame = tk.Frame(root, bg="#f0f0f0")
+button_frame.pack(pady=5)
+
+add_button = tk.Button(button_frame, text="Añadir Tarea", command=add_task, width=18)
+add_button.grid(row=0, column=0, padx=5, pady=2)
+
+complete_button = tk.Button(button_frame, text="Marcar Completada", command=mark_completed, width=18)
+complete_button.grid(row=0, column=1, padx=5, pady=2)
+
+delete_button = tk.Button(button_frame, text="Eliminar Tarea", command=delete_task, width=18)
+delete_button.grid(row=1, column=0, padx=5, pady=2)
+
+clear_button = tk.Button(button_frame, text="Eliminar Todas", command=clear_tasks, width=18)
+clear_button.grid(row=1, column=1, padx=5, pady=2)
+
+# Lista de tareas
+task_list = tk.Listbox(root, width=50, height=15, selectmode=tk.SINGLE)
+task_list.pack(pady=10)
+task_list.bind("<Double-Button-1>", mark_completed_double_click)
+
+# Ejecutar la aplicación
+root.mainloop()
